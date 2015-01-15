@@ -1,20 +1,45 @@
 #include "Lamp.h"
 
-Lamp::Lamp(int lampTimeout)
-	: triggered(false), lampTimeout(lampTimeout)
+Lamp::Lamp()
+	: visible(false), triggered(false), lampTimeout(1000)
 {
-	connect(&turnOffTimer, &QTimer::timeout, this, &Lamp::turnOff);
+	connect(&turnOffTimer, &QTimer::timeout, this, &Lamp::expire);
+}
+
+void Lamp::setTimeout(int timeout)
+{
+	lampTimeout = timeout;
+}
+
+void Lamp::setVisible(bool vis)
+{
+	visible = vis;
+	update();
 }
 
 void Lamp::turnOff()
 {
 	triggered = false;
+	update();
 }
 
 void Lamp::turnOn()
 {
 	triggered = true;
 	turnOffTimer.start(lampTimeout);
+	update();
+}
+
+bool Lamp::isOn() const
+{
+	return triggered;
+}
+
+void Lamp::expire()
+{
+	if (isOn())
+		emit expired();
+	turnOff();
 }
 
 QRectF Lamp::boundingRect() const
@@ -24,6 +49,9 @@ QRectF Lamp::boundingRect() const
 
 void Lamp::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+	if (!visible)
+		return;
+
 	QColor color;
 	if (triggered)
 		color = Qt::yellow;
