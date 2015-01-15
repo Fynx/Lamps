@@ -28,4 +28,6 @@ private:
 	bool triggered;
 	QTimer turnOffTimer;
 	int lampTimeout;
+
+	QPixmap *pixmap;
 };

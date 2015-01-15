@@ -4,6 +4,9 @@ Lamp::Lamp()
 	: visible(false), triggered(false), lampTimeout(1000)
 {
 	connect(&turnOffTimer, &QTimer::timeout, this, &Lamp::expire);
+	QImage image;
+	image.load("data/download.jpg", "JPG");
+	pixmap = new QPixmap(QPixmap::fromImage(image));
 }
 
 void Lamp::setTimeout(int timeout)
@@ -44,7 +47,7 @@ void Lamp::expire()
 
 QRectF Lamp::boundingRect() const
 {
-	return QRectF(-30, -50, 60, 100);
+	return QRectF(-64, -96, 128, 194);
 }
 
 void Lamp::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
@@ -52,12 +55,8 @@ void Lamp::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 	if (!visible)
 		return;
 
-	QColor color;
 	if (triggered)
-		color = Qt::yellow;
+		painter->drawPixmap(boundingRect(), *pixmap, QRectF(138, 0, 128, 194));
 	else
-		color = Qt::black;
-
-	painter->setBrush(color);
-	painter->drawEllipse(boundingRect());
+		painter->drawPixmap(boundingRect(), *pixmap, QRectF(0, 0, 128, 194));
 }

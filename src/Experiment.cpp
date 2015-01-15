@@ -23,7 +23,7 @@ Experiment::Experiment()
 	QGraphicsScene *scene = new QGraphicsScene();
 
 	QPointF position(100.0, 200.0);
-	qreal diff = 100.0;
+	qreal diff = 130.0;
 
 	for (Qt::Key key : keys) {
 		Lamp *lamp = new Lamp();
@@ -101,6 +101,7 @@ void Experiment::onLampExpired()
 
 void Experiment::start()
 {
+	qDebug() << "Start.";
 	timer.start(period);
 	started = true;
 	for (Lamp *lamp : lamps)
