@@ -1,14 +1,18 @@
 #include "Lamps.h"
 
 Lamps::Lamps()
+	: controlPanel(this)
 {
-	setCentralWidget(&experiment);
+	stackedWidget = new QStackedWidget();
+
+	stackedWidget->addWidget(&controlPanel);
+	stackedWidget->addWidget(&experiment);
+
+	setCentralWidget(stackedWidget);
 	showFullScreen();
 
-	experiment.setRandom(true);
-	experiment.setCheckProbability(0.3);
-	experiment.setTimeout(2000);
-	experiment.setExperimentTime(20001);
+	connect(&controlPanel, &ControlPanel::start, this, &Lamps::start);
+	connect(&controlPanel, &ControlPanel::quit, this, &Lamps::quit);
 
 	QMenu *menuFile = menuBar()->addMenu("File");
 
@@ -22,7 +26,7 @@ Lamps::Lamps()
 	connect(actionQuit, &QAction::triggered, this, &QMainWindow::close);
 	menuFile->addAction(actionQuit);
 
-	menuBar()->show();
+	stackedWidget->setCurrentIndex(0);
 }
 
 void Lamps::keyPressEvent(QKeyEvent *event)
@@ -31,4 +35,27 @@ void Lamps::keyPressEvent(QKeyEvent *event)
 		experiment.trigger(Qt::Key(event->key()));
 	else
 		QWidget::keyPressEvent(event);
+}
+
+void Lamps::settingsSet()
+{
+	experiment.setWithFeedback(controlPanel.withFeedback());
+	experiment.setWithTimer(controlPanel.withTimer());
+	experiment.setTimeout(controlPanel.timeout());
+	experiment.setRandom(controlPanel.isRandom());
+	experiment.setCheckProbability(controlPanel.checkProbability());
+	experiment.setExperimentTime(controlPanel.experimentTime());
+
+	experiment.setConfigurations();
+}
+
+void Lamps::start()
+{
+	settingsSet();
+	stackedWidget->setCurrentIndex(1);
+}
+
+void Lamps::quit()
+{
+	close();
 }

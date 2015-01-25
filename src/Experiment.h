@@ -13,9 +13,11 @@ public:
 
 	void setRandom(bool random);
 	void setCheckProbability(qreal prob);
-	void setConfigurations(const QSet<Configuration> &cs);
+	void setConfigurations(const QSet<Configuration> &cs = {});
 	void setTimeout(int time);
 	void setExperimentTime(int time);
+	void setWithFeedback(bool yes);
+	void setWithTimer(bool yes);
 
 	void start();
 	void stop();
@@ -30,12 +32,18 @@ signals:
 	void experimentEnded();
 
 private:
+	static QSet<Configuration> generateAllConfigurations();
+	void setNewConfiguration();
 	void saveConfiguration();
 	void timeout();
 	void onLampExpired();
 
 	QHash<int, Lamp *> lamps;
 	QSet<Configuration> configurations;
+	Configuration currentConfiguration;
+
+	bool feedback;
+	bool withTimer;
 
 	int totalTime;
 	bool randomConfigurations;

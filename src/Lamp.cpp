@@ -23,13 +23,15 @@ void Lamp::setVisible(bool vis)
 void Lamp::turnOff()
 {
 	triggered = false;
+	turnOffTimer.stop();
 	update();
 }
 
 void Lamp::turnOn()
 {
 	triggered = true;
-	turnOffTimer.start(lampTimeout);
+	if (lampTimeout)
+		turnOffTimer.start(lampTimeout);
 	update();
 }
 

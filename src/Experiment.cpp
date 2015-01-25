@@ -15,6 +15,7 @@ static const QList<Qt::Key> keys {
 
 Experiment::Experiment()
 	: QGraphicsView(),
+	  feedback(false),
 	  totalTime(0),
 	  randomConfigurations(false),
 	  checkProbability(0),
@@ -58,14 +59,17 @@ void Experiment::setCheckProbability(qreal prob)
 
 void Experiment::setConfigurations(const QSet<Experiment::Configuration> &cs)
 {
-	configurations = cs;
+	if (cs.isEmpty())
+		configurations = generateAllConfigurations();
+	else
+		configurations = cs;
 }
 
 void Experiment::setTimeout(int time)
 {
 	period = time;
 	for (Lamp *lamp : lamps)
-		lamp->setTimeout(time);
+		lamp->setTimeout(time * (int) withTimer);
 }
 
 void Experiment::setExperimentTime(int time)
@@ -73,24 +77,39 @@ void Experiment::setExperimentTime(int time)
 	totalTime = time;
 }
 
+void Experiment::setWithFeedback(bool yes)
+{
+	feedback = yes;
+}
+
+void Experiment::setWithTimer(bool yes)
+{
+	withTimer = yes;
+	for (Lamp *lamp : lamps)
+		lamp->setTimeout(period * (int) withTimer);
+}
+
 void Experiment::timeout()
 {
+	static int init = false;
+	if (!init) {
+		init = true;
+		qsrand(QTime::currentTime().msec());
+	}
+
 	timeElapsed += period;
-	if (timeElapsed >= totalTime) {
+	if (timeElapsed >= totalTime && withTimer) {
 		stop();
 		emit experimentEnded();
-	} else if (randomConfigurations) {
-		static int init = false;
-		if (!init) {
-			init = true;
-			qsrand(QTime::currentTime().msec());
-		}
-		for (Lamp *lamp : lamps) {
-			qreal randomNumber = (qreal) (qrand() % 1000);
-			static const qreal maxNumber = (qreal) (999);
-			if (randomNumber / maxNumber <= checkProbability)
-				lamp->turnOn();
-		}
+	}
+
+	if (!withTimer) {
+		for (Lamp *lamp : lamps)
+			if (lamp->isOn())
+				return;
+		setNewConfiguration();
+	} else {
+		setNewConfiguration();
 	}
 }
 
@@ -128,6 +147,8 @@ void Experiment::trigger(Qt::Key key)
 		lamps[key]->turnOff();
 	} else {
 		++incorrectChecks;
+		if (feedback)
+			qDebug() << "\a";
 	}
 }
 
@@ -153,6 +174,43 @@ QHash<QString, int> Experiment::getStats()
 	sts["timeElapsed"]     = timeElapsed;
 
 	return sts;
+}
+
+QSet<Experiment::Configuration> Experiment::generateAllConfigurations()
+{
+	QSet<Configuration> set;
+	for (int i = 0; i < (1 << 10); ++i) {
+		Configuration c(10);
+		for (int j = 0; j < 10; ++j)
+			c[j] = (i & (1 << j));
+		set.insert(c);
+	}
+	return set;
+}
+
+void Experiment::setNewConfiguration()
+{
+	if (randomConfigurations) {
+		for (Lamp *lamp : lamps) {
+			qreal randomNumber = (qreal) (qrand() % 1000);
+			static const qreal maxNumber = (qreal) (999);
+			if (randomNumber / maxNumber <= checkProbability)
+				lamp->turnOn();
+		}
+	} else {
+		int k = qrand() % configurations.size();
+		auto it = configurations.begin();
+		for (int i = 0; i < k; ++i)
+			++it;
+		currentConfiguration = *it;
+		int i = 0;
+		for (Lamp *lamp : lamps) {
+			if (currentConfiguration[i])
+				lamp->turnOn();
+			++i;
+		}
+		configurations.erase(it);
+	}
 }
 
 void Experiment::saveConfiguration()

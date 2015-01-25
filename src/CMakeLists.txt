@@ -1,4 +1,5 @@
 set (Lamps_SRCS
+	ControlPanel.cpp
 	Experiment.cpp
 	Lamp.cpp
 	Lamps.cpp
@@ -6,6 +7,7 @@ set (Lamps_SRCS
 )
 
 set (Lamps_HDRS
+	ControlPanel.h
 	Experiment.h
 	Lamp.h
 	Lamps.h
