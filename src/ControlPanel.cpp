@@ -5,11 +5,15 @@ ControlPanel::ControlPanel(QWidget* parent)
 {
 	QVBoxLayout *layout = new QVBoxLayout();
 
+
 	checkBoxWithFeedback = new QCheckBox("Ze sprzężeniem zwrotnym", this);
 	checkBoxWithTimer    = new QCheckBox("Z odliczaniem czasu", this);
 
 	layout->addWidget(checkBoxWithFeedback);
 	layout->addWidget(checkBoxWithTimer);
+
+
+	QHBoxLayout *layoutTimeout = new QHBoxLayout();
 
 	spinBoxTimeout = new QSpinBox(this);
 	spinBoxTimeout->setFixedWidth(100);
@@ -19,9 +23,16 @@ ControlPanel::ControlPanel(QWidget* parent)
 	QLabel *labelTimeout = new QLabel("Czas palenia się lampki (ms)");
 	labelTimeout->setBuddy(spinBoxTimeout);
 
-	layout->addWidget(spinBoxTimeout);
-	layout->addWidget(labelTimeout);
+	QSpacerItem *spacerTimeout = new QSpacerItem(30, 10);
 
+	layoutTimeout->addWidget(spinBoxTimeout);
+	layoutTimeout->addItem(spacerTimeout);
+	layoutTimeout->addWidget(labelTimeout);
+
+	layout->addItem(layoutTimeout);
+
+
+	QSpacerItem *spacerButtons = new QSpacerItem(30, 30);
 	buttonConfirm = new QPushButton("Start");
 	buttonQuit = new QPushButton("Wyjdź");
 
@@ -31,6 +42,7 @@ ControlPanel::ControlPanel(QWidget* parent)
 	connect(buttonConfirm, &QPushButton::clicked, this, &ControlPanel::start);
 	connect(buttonQuit, &QPushButton::clicked, this, &ControlPanel::quit);
 
+	layout->addItem(spacerButtons);
 	layout->addWidget(buttonConfirm);
 	layout->addWidget(buttonQuit);
 

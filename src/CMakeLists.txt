@@ -4,6 +4,7 @@ set (Lamps_SRCS
 	Lamp.cpp
 	Lamps.cpp
 	main.cpp
+	UserPanel.cpp
 )
 
 set (Lamps_HDRS
@@ -11,6 +12,7 @@ set (Lamps_HDRS
 	Experiment.h
 	Lamp.h
 	Lamps.h
+	UserPanel.h
 )
 
 qt5_wrap_cpp (Lamps_SRCS ${Lamps_HDRS})

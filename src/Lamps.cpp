@@ -1,18 +1,21 @@
 #include "Lamps.h"
 
 Lamps::Lamps()
-	: controlPanel(this)
+	: controlPanel(this), userPanel(this)
 {
 	stackedWidget = new QStackedWidget();
 
 	stackedWidget->addWidget(&controlPanel);
+	stackedWidget->addWidget(&userPanel);
 	stackedWidget->addWidget(&experiment);
 
 	setCentralWidget(stackedWidget);
 	showFullScreen();
 
-	connect(&controlPanel, &ControlPanel::start, this, &Lamps::start);
+	connect(&controlPanel, &ControlPanel::start, this, &Lamps::settingsSet);
 	connect(&controlPanel, &ControlPanel::quit, this, &Lamps::quit);
+	connect(&experiment, &Experiment::experimentEnded, this, &Lamps::settingsSet);
+	connect(&userPanel, &UserPanel::start, this, &Lamps::start);
 
 	QMenu *menuFile = menuBar()->addMenu("File");
 
@@ -45,14 +48,16 @@ void Lamps::settingsSet()
 	experiment.setRandom(controlPanel.isRandom());
 	experiment.setCheckProbability(controlPanel.checkProbability());
 	experiment.setExperimentTime(controlPanel.experimentTime());
-
 	experiment.setConfigurations();
+
+	userPanel.clear();
+	stackedWidget->setCurrentIndex(1);
 }
 
 void Lamps::start()
 {
-	settingsSet();
-	stackedWidget->setCurrentIndex(1);
+	qDebug() << userPanel.nick();
+	stackedWidget->setCurrentIndex(2);
 }
 
 void Lamps::quit()

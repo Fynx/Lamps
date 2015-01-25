@@ -4,6 +4,7 @@
 
 #include "ControlPanel.h"
 #include "Experiment.h"
+#include "UserPanel.h"
 
 class Lamps : public QMainWindow {
 public:
@@ -20,4 +21,5 @@ private:
 	QStackedWidget *stackedWidget;
 	ControlPanel controlPanel;
 	Experiment experiment;
+	UserPanel userPanel;
 };
