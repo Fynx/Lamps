@@ -5,7 +5,7 @@
 class Lamp : public QGraphicsObject {
 Q_OBJECT;
 public:
-	Lamp();
+	Lamp(const QString &key);
 
 	void setTimeout(int timeout);
 	void setVisible(bool vis);
@@ -23,6 +23,8 @@ private:
 
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+
+	QString key;
 
 	bool visible;
 	bool triggered;

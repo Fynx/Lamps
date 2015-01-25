@@ -1,7 +1,7 @@
 #include "Lamp.h"
 
-Lamp::Lamp()
-	: visible(false), triggered(false), lampTimeout(1000)
+Lamp::Lamp(const QString &key)
+	: key(key), visible(false), triggered(false), lampTimeout(1000)
 {
 	connect(&turnOffTimer, &QTimer::timeout, this, &Lamp::expire);
 	QImage image;
@@ -49,7 +49,7 @@ void Lamp::expire()
 
 QRectF Lamp::boundingRect() const
 {
-	return QRectF(-64, -96, 128, 194);
+	return QRectF(-64, -96, 128, 194 + 100);
 }
 
 void Lamp::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
@@ -58,7 +58,12 @@ void Lamp::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 		return;
 
 	if (triggered)
-		painter->drawPixmap(boundingRect(), *pixmap, QRectF(138, 0, 128, 194));
+		painter->drawPixmap(QRectF(-64, -96, 128, 194), *pixmap, QRectF(138, 0, 128, 194));
 	else
-		painter->drawPixmap(boundingRect(), *pixmap, QRectF(0, 0, 128, 194));
+		painter->drawPixmap(QRectF(-64, -96, 128, 194), *pixmap, QRectF(0, 0, 128, 194));
+	QPen pen;
+	pen.setWidth(5);
+	pen.setColor(Qt::white);
+	painter->setPen(pen);
+	painter->drawText(QPointF(-10, 120), key);
 }

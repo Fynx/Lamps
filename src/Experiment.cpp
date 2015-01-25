@@ -13,6 +13,19 @@ static const QList<Qt::Key> keys {
 	Qt::Key_P,
 };
 
+static const QMap<Qt::Key, QString> keyToString {
+	{Qt::Key_Q, "Q"},
+	{Qt::Key_W, "W"},
+	{Qt::Key_E, "E"},
+	{Qt::Key_R, "R"},
+	{Qt::Key_T, "T"},
+	{Qt::Key_Y, "Y"},
+	{Qt::Key_U, "U"},
+	{Qt::Key_I, "I"},
+	{Qt::Key_O, "O"},
+	{Qt::Key_P, "P"},
+};
+
 Experiment::Experiment()
 	: QGraphicsView(),
 	  feedback(false),
@@ -27,7 +40,7 @@ Experiment::Experiment()
 	qreal diff = 130.0;
 
 	for (Qt::Key key : keys) {
-		Lamp *lamp = new Lamp();
+		Lamp *lamp = new Lamp(keyToString[key]);
 		lamp->setPos(position);
 		position.rx() += diff;
 		lamps[key] = lamp;
