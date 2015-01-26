@@ -32,6 +32,8 @@ Lamps::Lamps()
 	menuFile->addAction(actionQuit);
 
 	stackedWidget->setCurrentIndex(0);
+
+	menuBar()->hide();
 }
 
 void Lamps::keyPressEvent(QKeyEvent *event)
@@ -41,6 +43,8 @@ void Lamps::keyPressEvent(QKeyEvent *event)
 			experiment.stop();
 		else if (event->key() == Qt::Key_D)
 			experiment.start();
+		else if (event->key() == Qt::Key_Q)
+			close();
 	}
 	if (!event->modifiers())
 		experiment.trigger(Qt::Key(event->key()));
@@ -62,6 +66,8 @@ void Lamps::settingsSet()
 	stackedWidget->setCurrentIndex(1);
 
 	experimentStartTime = QTime::currentTime();
+
+	experiment.setPractise(true);
 }
 
 void Lamps::start()
@@ -77,11 +83,23 @@ void Lamps::quit()
 
 void Lamps::save()
 {
+	if (experiment.isPractise()) {
+		experiment.clearConfigurations();
+		experiment.setConfigurations();
+		experiment.resetStats();
+		experiment.setPractise(false);
+		return;
+	} else {
+		qDebug() << "saving statistics";
+	}
+
 	QVector<QVector<QVariant> > info;
 	info.append({"pseudonim", userPanel.nick()});
 	info.append({"data", QDate::currentDate().toString("d.M.yy")});
 	info.append({"\"czas rozpoczecia\"", experimentStartTime.toString("hh:mm:ss")});
 	info.append({"\"czas zatrzymania\"", QTime::currentTime().toString("hh:mm:ss")});
+	info.append({"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"});
 
-	CSVWriter::saveVectors("plik.csv", info + experiment.getStatsList());
+	CSVWriter::saveVectors(userPanel.nick() + "." + QDate::currentDate().toString("d.M.yy")
+		+ ".csv", info + experiment.getStatsList());
 }

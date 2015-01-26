@@ -48,12 +48,42 @@ Experiment::Experiment()
 		scene->addItem(lamp);
 	}
 
+	textMainSessionName = new QGraphicsTextItem("Sesja główna");
+	textTrialSessionName = new QGraphicsTextItem("Sesja próbna");
+	textStartSession = new QGraphicsTextItem("Aby zacząć sesję, wciśnij Ctrl+Shift+D");
+	textStopSession = new QGraphicsTextItem("Aby zatrzymać sesję, wciśnij Ctrl+Shift+S");
+	textResumeSession = new QGraphicsTextItem("Aby ponowić sesję wciśnij Ctrl+Shift+D");
+	textTrialSession = new QGraphicsTextItem("Aby zakończyć sesję próbną, wciśnij Ctrl+Shift+S");
+
+	textMainSessionName->setPos(600, -200);
+	textTrialSessionName->setPos(600, -200);
+	textStartSession->setPos(100, -200);
+	textStopSession->setPos(100, -160);
+	textTrialSession->setPos(100, -160);
+	textResumeSession->setPos(100, -160);
+
+	textMainSessionName->setDefaultTextColor(Qt::white);
+	textTrialSessionName->setDefaultTextColor(Qt::white);
+	textStartSession->setDefaultTextColor(Qt::white);
+	textStopSession->setDefaultTextColor(Qt::white);
+	textTrialSession->setDefaultTextColor(Qt::white);
+	textResumeSession->setDefaultTextColor(Qt::white);
+
 	resetStats();
+
+	scene->addItem(textMainSessionName);
+	scene->addItem(textTrialSessionName);
+	scene->addItem(textStartSession);
+	scene->addItem(textStopSession);
+	scene->addItem(textTrialSession);
+	scene->addItem(textResumeSession);
 
 	setScene(scene);
 
 	elapsedTimer.start();
 	connect(&timer, &QTimer::timeout, this, &Experiment::timeout);
+
+	updateText();
 }
 
 Experiment::~Experiment()
@@ -103,6 +133,17 @@ void Experiment::setWithTimer(bool yes)
 		lamp->setTimeout(period * (int) withTimer);
 }
 
+void Experiment::setPractise(bool yes)
+{
+	practise = yes;
+	updateText();
+}
+
+bool Experiment::isPractise() const
+{
+	return practise;
+}
+
 void Experiment::timeout()
 {
 	static int init = false;
@@ -136,11 +177,41 @@ void Experiment::onLampExpired()
 	++skippedChecks;
 }
 
+void Experiment::updateText()
+{
+	if (practise) {
+		textTrialSessionName->setVisible(true);
+		textMainSessionName->setVisible(false);
+	} else {
+		textTrialSessionName->setVisible(false);
+		textMainSessionName->setVisible(true);
+	}
+
+	if (started) {
+		if (!practise) {
+			textStopSession->setVisible(true);
+			textTrialSession->setVisible(false);
+		} else {
+			textStopSession->setVisible(false);
+			textTrialSession->setVisible(true);
+		}
+		textStartSession->setVisible(false);
+	} else {
+		textStartSession->setVisible(true);
+		textStopSession->setVisible(false);
+		textTrialSession->setVisible(false);
+	}
+
+	textResumeSession->setVisible(false);
+
+	scene()->update();
+}
+
 void Experiment::start()
 {
-	qDebug() << "Start.";
 	timer.start(period);
 	started = true;
+	updateText();
 	for (Lamp *lamp : lamps)
 		lamp->setVisible(true);
 }
@@ -149,6 +220,7 @@ void Experiment::stop()
 {
 	timer.stop();
 	started = false;
+	updateText();
 	saveConfiguration();
 	for (Lamp *lamp : lamps)
 		lamp->setVisible(false);
@@ -197,17 +269,15 @@ QHash<QString, int> Experiment::getStats()
 QVector<QVector<QVariant> > Experiment::getStatsList() const
 {
 	QVector<QVector<QVariant> > result;
-	result.append({"correctChecks", correctChecks});
-	result.append({"incorrectChecks", incorrectChecks});
-	result.append({"skippedChecks", skippedChecks});
-	result.append({"timeElapsed", timeElapsed});
+	result.append({"\"Poprawne klikniecia\"", correctChecks});
+	result.append({"\"Niepoprawne klikniecia\"", incorrectChecks});
+	result.append({"\"Ominiete klikniecia\"", skippedChecks});
+	result.append({"\"Czas (ms)\"", timeElapsed});
 
-	qDebug() << "usedConfigurations:";
 	for (auto &x : usedConfigurations) {
 		QVector<QVariant> vec;
 		for (const int &a : x.second)
 			vec.append(a);
-		qDebug() << vec;
 		result.append(vec);
 	}
 	return result;

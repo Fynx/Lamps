@@ -18,6 +18,9 @@ public:
 	void setExperimentTime(int time);
 	void setWithFeedback(bool yes);
 	void setWithTimer(bool yes);
+	void setPractise(bool yes);
+
+	bool isPractise() const;
 
 	void start();
 	void stop();
@@ -40,6 +43,15 @@ private:
 	void timeout();
 	void onLampExpired();
 
+	void updateText();
+
+	QGraphicsTextItem *textMainSessionName;
+	QGraphicsTextItem *textTrialSessionName;
+	QGraphicsTextItem *textStartSession;
+	QGraphicsTextItem *textStopSession;
+	QGraphicsTextItem *textResumeSession;
+	QGraphicsTextItem *textTrialSession;
+
 	QHash<int, Lamp *> lamps;
 	QVector<int> currentChecksTimeouts;
 	QSet<Configuration> configurations;
@@ -47,6 +59,9 @@ private:
 
 	bool feedback;
 	bool withTimer;
+	bool practise;
+
+	bool toResume;
 
 	int totalTime;
 	bool randomConfigurations;
