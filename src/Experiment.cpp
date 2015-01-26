@@ -152,6 +152,8 @@ void Experiment::timeout()
 		qsrand(QTime::currentTime().msec());
 	}
 
+	drawRectangle(Qt::green);
+
 	timeElapsed += period;
 	if ((timeElapsed >= totalTime && totalTime != 0) || (configurations.isEmpty() && !randomConfigurations)) {
 		stop();
@@ -207,6 +209,15 @@ void Experiment::updateText()
 	scene()->update();
 }
 
+void Experiment::drawRectangle(QColor color)
+{
+	QPen rectPen;
+	QBrush rectBrush(color);
+	rectPen.setColor(color);
+// 	scene()->addRect(QRectF(50, 330, 1250, 50), rectPen, rectBrush);
+// 	scene()->setSceneRect(QRectF(-1366/2, -768/2, 1366, 768));
+}
+
 void Experiment::start()
 {
 	timer.start(period);
@@ -220,6 +231,7 @@ void Experiment::stop()
 {
 	timer.stop();
 	started = false;
+	drawRectangle(Qt::black);
 	updateText();
 	saveConfiguration();
 	for (Lamp *lamp : lamps)

@@ -44,6 +44,7 @@ private:
 	void onLampExpired();
 
 	void updateText();
+	void drawRectangle(QColor color);
 
 	QGraphicsTextItem *textMainSessionName;
 	QGraphicsTextItem *textTrialSessionName;
@@ -51,6 +52,8 @@ private:
 	QGraphicsTextItem *textStopSession;
 	QGraphicsTextItem *textResumeSession;
 	QGraphicsTextItem *textTrialSession;
+
+	QGraphicsRectItem *rectColors;
 
 	QHash<int, Lamp *> lamps;
 	QVector<int> currentChecksTimeouts;
