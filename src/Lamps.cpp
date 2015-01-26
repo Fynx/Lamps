@@ -59,15 +59,19 @@ void Lamps::settingsSet()
 	experiment.setTimeout(controlPanel.timeout());
 	experiment.setRandom(controlPanel.isRandom());
 	experiment.setCheckProbability(controlPanel.checkProbability());
-	experiment.setExperimentTime(controlPanel.experimentTime());
+	experiment.setExperimentTime(controlPanel.maxExperimentTime());
 	experiment.setConfigurations();
 
-	userPanel.clear();
-	stackedWidget->setCurrentIndex(1);
+	if (!controlPanel.filePath().isEmpty() && load()) {
+		stackedWidget->setCurrentIndex(2);
+		experiment.setPractise(false);
+	} else {
+		sessionNumber = 1;
+		stackedWidget->setCurrentIndex(1);
+		experiment.setPractise(true);
+	}
 
 	experimentStartTime = QTime::currentTime();
-
-	experiment.setPractise(true);
 }
 
 void Lamps::start()
@@ -98,8 +102,52 @@ void Lamps::save()
 	info.append({"data", QDate::currentDate().toString("d.M.yy")});
 	info.append({"\"czas rozpoczecia\"", experimentStartTime.toString("hh:mm:ss")});
 	info.append({"\"czas zatrzymania\"", QTime::currentTime().toString("hh:mm:ss")});
-	info.append({"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"});
+	info.append({"\"numer sesji\"", sessionNumber});
 
-	CSVWriter::saveVectors(userPanel.nick() + "." + QDate::currentDate().toString("d.M.yy")
-		+ ".csv", info + experiment.getStatsList());
+	QString filePath = controlPanel.filePath();
+	if (filePath.isEmpty())
+		filePath = userPanel.nick() + "." + QDate::currentDate().toString("d.M.yy") + ".csv";
+
+	CSVWriter::saveVectors(filePath, info + experiment.getStatsList());
+
+	experiment.resetStats();
+}
+
+bool Lamps::load()
+{
+	QFile file(controlPanel.filePath());
+
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		qDebug() << "Unable to open file!";
+		return false;
+	}
+
+	qDebug() << "loading" << controlPanel.filePath();
+
+	QSet<Experiment::Configuration> configurations;
+
+	while (!file.atEnd()) {
+		QByteArray data = file.readLine();
+		QStringList list = QString(data).split(",");
+		if (list[0] == "\"numer sesji\"") {
+			if (sessionNumber == list[1].toInt())
+				configurations.clear();
+			sessionNumber = list[1].toInt() + 1;
+		} else if (list[0] == "pseudonim") {
+			userPanel.setNick(list[1].left(list[1].size() - 1));
+		} else if (list.size() == 10) {
+			Experiment::Configuration c(10);
+			int i = 0;
+			for (const QString &l : list)
+				c[i++] = (l.toInt() != 0);
+			configurations.insert(c);
+		}
+	}
+
+	experiment.setConfigurations();
+	experiment.removeConfigurations(configurations);
+
+	qDebug() << "done!";
+
+	return true;
 }

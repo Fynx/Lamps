@@ -26,8 +26,12 @@ QString CSVWriter::fromVector(const QVector<QVariant> &vector)
 bool CSVWriter::saveVectors(const QString &fileName, const QVector<QVector<QVariant> > &vectors)
 {
 	QFile file(fileName);
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+	if (!file.open(QIODevice::ReadWrite | QIODevice::Text))
 		return false;
+
+	file.seek(file.size());
+
+	file.write("\n");
 
 	for (const QVector<QVariant> &vector : vectors) {
 		QString outputString = fromVector(vector);

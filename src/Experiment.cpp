@@ -54,6 +54,7 @@ Experiment::Experiment()
 	textStopSession = new QGraphicsTextItem("Aby zatrzymać sesję, wciśnij Ctrl+Shift+S");
 	textResumeSession = new QGraphicsTextItem("Aby ponowić sesję wciśnij Ctrl+Shift+D");
 	textTrialSession = new QGraphicsTextItem("Aby zakończyć sesję próbną, wciśnij Ctrl+Shift+S");
+	textExperimentEnded = new QGraphicsTextItem("Eksperyment zakończony! Naciśnij Ctrl+Shift+Q aby wyjść z programu.");
 
 	textMainSessionName->setPos(600, -200);
 	textTrialSessionName->setPos(600, -200);
@@ -61,6 +62,7 @@ Experiment::Experiment()
 	textStopSession->setPos(100, -160);
 	textTrialSession->setPos(100, -160);
 	textResumeSession->setPos(100, -160);
+	textExperimentEnded->setPos(600, -100);
 
 	textMainSessionName->setDefaultTextColor(Qt::white);
 	textTrialSessionName->setDefaultTextColor(Qt::white);
@@ -68,6 +70,7 @@ Experiment::Experiment()
 	textStopSession->setDefaultTextColor(Qt::white);
 	textTrialSession->setDefaultTextColor(Qt::white);
 	textResumeSession->setDefaultTextColor(Qt::white);
+	textExperimentEnded->setDefaultTextColor(Qt::white);
 
 	resetStats();
 
@@ -77,6 +80,7 @@ Experiment::Experiment()
 	scene->addItem(textStopSession);
 	scene->addItem(textTrialSession);
 	scene->addItem(textResumeSession);
+	scene->addItem(textExperimentEnded);
 
 	setScene(scene);
 
@@ -154,6 +158,9 @@ void Experiment::timeout()
 
 	drawRectangle(Qt::green);
 
+	if (configurations.isEmpty())
+		setConfigurations();
+
 	timeElapsed += period;
 	if ((timeElapsed >= totalTime && totalTime != 0) || (configurations.isEmpty() && !randomConfigurations)) {
 		stop();
@@ -205,6 +212,8 @@ void Experiment::updateText()
 	}
 
 	textResumeSession->setVisible(false);
+
+	textExperimentEnded->setVisible(false);
 
 	scene()->update();
 }
@@ -259,12 +268,19 @@ void Experiment::clearConfigurations()
 	configurations.clear();
 }
 
+void Experiment::removeConfigurations(const QSet<Experiment::Configuration> &cs)
+{
+	configurations -= cs;
+}
+
 void Experiment::resetStats()
 {
 	correctChecks   = 0;
 	incorrectChecks = 0;
 	skippedChecks   = 0;
 	timeElapsed     = 0;
+
+	usedConfigurations.clear();
 }
 
 QHash<QString, int> Experiment::getStats()
@@ -285,6 +301,8 @@ QVector<QVector<QVariant> > Experiment::getStatsList() const
 	result.append({"\"Niepoprawne klikniecia\"", incorrectChecks});
 	result.append({"\"Ominiete klikniecia\"", skippedChecks});
 	result.append({"\"Czas (ms)\"", timeElapsed});
+
+	result.append({"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"});
 
 	for (auto &x : usedConfigurations) {
 		QVector<QVariant> vec;

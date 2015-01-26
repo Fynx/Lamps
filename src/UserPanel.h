@@ -10,6 +10,7 @@ public:
 	void clear();
 
 	QString nick() const;
+	void setNick(const QString &nick);
 
 signals:
 	void start();

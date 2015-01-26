@@ -52,6 +52,11 @@ QString UserPanel::nick() const
 	return lineEditNick->text();
 }
 
+void UserPanel::setNick(const QString &nick)
+{
+	lineEditNick->setText(nick);
+}
+
 void UserPanel::started()
 {
 	if (!nick().isEmpty())

@@ -27,6 +27,7 @@ public:
 	void trigger(Qt::Key key);
 
 	void clearConfigurations();
+	void removeConfigurations(const QSet<Configuration> &cs);
 
 	void resetStats();
 	QHash<QString, int> getStats();
@@ -52,6 +53,7 @@ private:
 	QGraphicsTextItem *textStopSession;
 	QGraphicsTextItem *textResumeSession;
 	QGraphicsTextItem *textTrialSession;
+	QGraphicsTextItem *textExperimentEnded;
 
 	QGraphicsRectItem *rectColors;
 

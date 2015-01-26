@@ -6,6 +6,20 @@ ControlPanel::ControlPanel(QWidget* parent)
 	QVBoxLayout *layout = new QVBoxLayout();
 
 
+	QHBoxLayout *layoutMaxExperimentTime = new QHBoxLayout();
+
+	QSpacerItem *spacerMaxExperimentTime = new QSpacerItem(30, 10);
+	QLabel *labelMaxExperimentTime = new QLabel("Maksymalny czas eksperymentu");
+	spinBoxMaxExperimentTime = new QSpinBox();
+	spinBoxMaxExperimentTime->setFixedWidth(100);
+
+	layoutMaxExperimentTime->addWidget(spinBoxMaxExperimentTime);
+	layoutMaxExperimentTime->addItem(spacerMaxExperimentTime);
+	layoutMaxExperimentTime->addWidget(labelMaxExperimentTime);
+
+	layout->addItem(layoutMaxExperimentTime);
+
+
 	checkBoxWithFeedback = new QCheckBox("Ze sprzężeniem zwrotnym", this);
 	checkBoxWithTimer    = new QCheckBox("Z odliczaniem czasu", this);
 
@@ -35,14 +49,22 @@ ControlPanel::ControlPanel(QWidget* parent)
 	QSpacerItem *spacerButtons = new QSpacerItem(30, 30);
 	buttonConfirm = new QPushButton("Start");
 	buttonQuit = new QPushButton("Wyjdź");
+	QSpacerItem *spacerLoad = new QSpacerItem(30, 30);
+	buttonLoadLast = new QPushButton("Wczytaj sesję");
+	labelSessionFileName = new QLabel("");
 
 	buttonConfirm->setFixedWidth(70);
 	buttonQuit->setFixedWidth(70);
+	buttonLoadLast->setFixedWidth(140);
 
 	connect(buttonConfirm, &QPushButton::clicked, this, &ControlPanel::start);
 	connect(buttonQuit, &QPushButton::clicked, this, &ControlPanel::quit);
+	connect(buttonLoadLast, &QPushButton::clicked, this, &ControlPanel::loadSession);
 
 	layout->addItem(spacerButtons);
+	layout->addWidget(labelSessionFileName);
+	layout->addWidget(buttonLoadLast);
+	layout->addItem(spacerLoad);
 	layout->addWidget(buttonConfirm);
 	layout->addWidget(buttonQuit);
 
@@ -53,6 +75,11 @@ ControlPanel::ControlPanel(QWidget* parent)
 
 ControlPanel::~ControlPanel()
 {}
+
+int ControlPanel::maxExperimentTime() const
+{
+	return spinBoxMaxExperimentTime->value();
+}
 
 bool ControlPanel::withFeedback() const
 {
@@ -79,7 +106,14 @@ int ControlPanel::timeout() const
 	return spinBoxTimeout->value();
 }
 
-int ControlPanel::experimentTime() const
+QString ControlPanel::filePath() const
 {
-	return 0;
+	return sessionFilePath;
+}
+
+void ControlPanel::loadSession()
+{
+	sessionFilePath = QFileDialog::getOpenFileName(this, "Open session", "", tr("Excel files (*.csv)"));
+	labelSessionFileName->setText(sessionFilePath);
+	qDebug() << sessionFilePath;
 }
