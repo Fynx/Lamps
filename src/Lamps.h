@@ -13,6 +13,7 @@ public:
 	void keyPressEvent(QKeyEvent *event);
 
 private:
+	void setSettings();
 	void settingsSet();
 
 	void start();

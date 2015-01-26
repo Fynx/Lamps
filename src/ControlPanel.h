@@ -16,6 +16,11 @@ public:
 	int timeout() const;
 	QString filePath() const;
 
+	void setMaxExperimentTime(int time);
+	void setWithFeedback(bool feedback);
+	void setWithTimer(bool timer);
+	void setTimeout(int timeout);
+
 signals:
 	void start();
 	void quit();

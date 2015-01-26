@@ -52,7 +52,7 @@ void Lamps::keyPressEvent(QKeyEvent *event)
 		QWidget::keyPressEvent(event);
 }
 
-void Lamps::settingsSet()
+void Lamps::setSettings()
 {
 	experiment.setWithFeedback(controlPanel.withFeedback());
 	experiment.setWithTimer(controlPanel.withTimer());
@@ -60,6 +60,11 @@ void Lamps::settingsSet()
 	experiment.setRandom(controlPanel.isRandom());
 	experiment.setCheckProbability(controlPanel.checkProbability());
 	experiment.setExperimentTime(controlPanel.maxExperimentTime());
+}
+
+void Lamps::settingsSet()
+{
+	setSettings();
 	experiment.setConfigurations();
 
 	if (!controlPanel.filePath().isEmpty() && load()) {
@@ -100,9 +105,14 @@ void Lamps::save()
 	QVector<QVector<QVariant> > info;
 	info.append({"pseudonim", userPanel.nick()});
 	info.append({"data", QDate::currentDate().toString("d.M.yy")});
+	info.append({"\"numer sesji\"", sessionNumber});
 	info.append({"\"czas rozpoczecia\"", experimentStartTime.toString("hh:mm:ss")});
 	info.append({"\"czas zatrzymania\"", QTime::currentTime().toString("hh:mm:ss")});
-	info.append({"\"numer sesji\"", sessionNumber});
+
+	info.append({"\"max czas eksperymentu\"", controlPanel.maxExperimentTime()});
+	info.append({"\"sprzezenie zwrotne\"", (int) controlPanel.withFeedback()});
+	info.append({"\"z czasem\"", (int) controlPanel.withTimer()});
+	info.append({"\"timeout\"", controlPanel.timeout()});
 
 	QString filePath = controlPanel.filePath();
 	if (filePath.isEmpty())
@@ -135,6 +145,14 @@ bool Lamps::load()
 			sessionNumber = list[1].toInt() + 1;
 		} else if (list[0] == "pseudonim") {
 			userPanel.setNick(list[1].left(list[1].size() - 1));
+		} else if (list[0] == "\"max czas eksperymentu\"") {
+			controlPanel.setMaxExperimentTime(list[1].toInt());
+		} else if (list[0] == "\"sprzezenie zwrotne\"") {
+			controlPanel.setWithFeedback((bool) list[1].toInt());
+		} else if (list[0] == "\"z czasem\"") {
+			controlPanel.setWithTimer((bool) list[1].toInt());
+		} else if (list[0] == "\"timeout\"") {
+			controlPanel.setTimeout(list[1].toInt());
 		} else if (list.size() == 10) {
 			Experiment::Configuration c(10);
 			int i = 0;
@@ -146,6 +164,8 @@ bool Lamps::load()
 
 	experiment.setConfigurations();
 	experiment.removeConfigurations(configurations);
+
+	setSettings();
 
 	qDebug() << "done!";
 

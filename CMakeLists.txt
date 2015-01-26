@@ -1,6 +1,6 @@
 project (Lamps)
 cmake_minimum_required (VERSION 2.8)
-find_package (Qt5 COMPONENTS Core Gui Widgets)
+find_package (Qt5 COMPONENTS Core Gui Widgets Multimedia)
 set (CMAKE_CXX_FLAGS "-Wall -Werror -std=c++11 -ggdb -pg")
 
 include_directories (${Qt5Widgets_INCLUDE_DIRS} ${Lamps_SOURCE_DIR}/src)

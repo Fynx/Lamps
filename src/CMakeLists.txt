@@ -19,4 +19,4 @@ set (Lamps_HDRS
 qt5_wrap_cpp (Lamps_SRCS ${Lamps_HDRS})
 
 add_executable (Lamps ${Lamps_SRCS})
-target_link_libraries (Lamps ${Qt5Widgets_LIBRARIES})
+target_link_libraries (Lamps ${Qt5Widgets_LIBRARIES} ${Qt5Multimedia_LIBRARIES})

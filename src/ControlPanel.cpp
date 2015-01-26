@@ -111,6 +111,26 @@ QString ControlPanel::filePath() const
 	return sessionFilePath;
 }
 
+void ControlPanel::setMaxExperimentTime(int time)
+{
+	spinBoxMaxExperimentTime->setValue(time);
+}
+
+void ControlPanel::setWithFeedback(bool feedback)
+{
+	checkBoxWithFeedback->setChecked(feedback);
+}
+
+void ControlPanel::setWithTimer(bool timer)
+{
+	checkBoxWithTimer->setChecked(timer);
+}
+
+void ControlPanel::setTimeout(int timeout)
+{
+	spinBoxTimeout->setValue(timeout);
+}
+
 void ControlPanel::loadSession()
 {
 	sessionFilePath = QFileDialog::getOpenFileName(this, "Open session", "", tr("Excel files (*.csv)"));

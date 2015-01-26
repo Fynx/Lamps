@@ -1,4 +1,12 @@
 #include "Experiment.h"
+#include <QtMultimedia/QSound>
+#include <iostream>
+
+static void beep()
+{
+	QSound::play("data/beep.wav");
+// 	std::cerr << "\a";
+}
 
 static const QList<Qt::Key> keys {
 	Qt::Key_Q,
@@ -176,8 +184,9 @@ void Experiment::timeout()
 		usedConfigurations.append({currentConfiguration, currentChecksTimeouts});
 	timestamp = elapsedTimer.elapsed();
 	currentChecksTimeouts = QVector<int>(10);
-	for (int &a : currentChecksTimeouts)
-		a = 0;
+	int i = 0;
+	for (Lamp *lamp : lamps)
+		currentChecksTimeouts[i++] = -1 * (int) (lamp->isOn());
 	setNewConfiguration();
 }
 
@@ -259,7 +268,7 @@ void Experiment::trigger(Qt::Key key)
 	} else {
 		++incorrectChecks;
 		if (feedback)
-			qDebug() << "\a";
+			beep();
 	}
 }
 
