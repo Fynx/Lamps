@@ -52,6 +52,7 @@ Experiment::Experiment()
 
 	setScene(scene);
 
+	elapsedTimer.start();
 	connect(&timer, &QTimer::timeout, this, &Experiment::timeout);
 }
 
@@ -111,7 +112,7 @@ void Experiment::timeout()
 	}
 
 	timeElapsed += period;
-	if (timeElapsed >= totalTime && withTimer) {
+	if ((timeElapsed >= totalTime && totalTime != 0) || (configurations.isEmpty() && !randomConfigurations)) {
 		stop();
 		emit experimentEnded();
 	}
@@ -120,10 +121,14 @@ void Experiment::timeout()
 		for (Lamp *lamp : lamps)
 			if (lamp->isOn())
 				return;
-		setNewConfiguration();
-	} else {
-		setNewConfiguration();
 	}
+	if (!currentConfiguration.isNull())
+		usedConfigurations.append({currentConfiguration, currentChecksTimeouts});
+	timestamp = elapsedTimer.elapsed();
+	currentChecksTimeouts = QVector<int>(10);
+	for (int &a : currentChecksTimeouts)
+		a = 0;
+	setNewConfiguration();
 }
 
 void Experiment::onLampExpired()
@@ -147,8 +152,7 @@ void Experiment::stop()
 	saveConfiguration();
 	for (Lamp *lamp : lamps)
 		lamp->setVisible(false);
-
-	qDebug() << getStats();
+	emit experimentStopped();
 }
 
 void Experiment::trigger(Qt::Key key)
@@ -157,6 +161,7 @@ void Experiment::trigger(Qt::Key key)
 		return;
 	if (lamps[key]->isOn()) {
 		++correctChecks;
+		currentChecksTimeouts[keys.indexOf(key)] = elapsedTimer.elapsed() - timestamp;
 		lamps[key]->turnOff();
 	} else {
 		++incorrectChecks;
@@ -187,6 +192,25 @@ QHash<QString, int> Experiment::getStats()
 	sts["timeElapsed"]     = timeElapsed;
 
 	return sts;
+}
+
+QVector<QVector<QVariant> > Experiment::getStatsList() const
+{
+	QVector<QVector<QVariant> > result;
+	result.append({"correctChecks", correctChecks});
+	result.append({"incorrectChecks", incorrectChecks});
+	result.append({"skippedChecks", skippedChecks});
+	result.append({"timeElapsed", timeElapsed});
+
+	qDebug() << "usedConfigurations:";
+	for (auto &x : usedConfigurations) {
+		QVector<QVariant> vec;
+		for (const int &a : x.second)
+			vec.append(a);
+		qDebug() << vec;
+		result.append(vec);
+	}
+	return result;
 }
 
 QSet<Experiment::Configuration> Experiment::generateAllConfigurations()

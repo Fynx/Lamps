@@ -27,9 +27,11 @@ public:
 
 	void resetStats();
 	QHash<QString, int> getStats();
+	QVector<QVector<QVariant> > getStatsList() const;
 
 signals:
 	void experimentEnded();
+	void experimentStopped();
 
 private:
 	static QSet<Configuration> generateAllConfigurations();
@@ -39,6 +41,7 @@ private:
 	void onLampExpired();
 
 	QHash<int, Lamp *> lamps;
+	QVector<int> currentChecksTimeouts;
 	QSet<Configuration> configurations;
 	Configuration currentConfiguration;
 
@@ -49,6 +52,8 @@ private:
 	bool randomConfigurations;
 	qreal checkProbability;
 
+	int timestamp;
+	QElapsedTimer elapsedTimer;
 	QTimer timer;
 	int period;
 	bool started;
@@ -58,4 +63,5 @@ private:
 	int incorrectChecks;
 	int skippedChecks;
 	int timeElapsed;
+	QVector<QPair<Configuration, QVector<int> > > usedConfigurations;
 };

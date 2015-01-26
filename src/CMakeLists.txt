@@ -1,5 +1,6 @@
 set (Lamps_SRCS
 	ControlPanel.cpp
+	CSVWriter.h
 	Experiment.cpp
 	Lamp.cpp
 	Lamps.cpp

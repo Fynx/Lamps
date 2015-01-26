@@ -16,6 +16,7 @@ public:
 	bool isOn() const;
 
 signals:
+	void checked();
 	void expired();
 
 private:

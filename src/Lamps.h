@@ -17,9 +17,11 @@ private:
 
 	void start();
 	void quit();
+	void save();
 
 	QStackedWidget *stackedWidget;
 	ControlPanel controlPanel;
 	Experiment experiment;
 	UserPanel userPanel;
+	QTime experimentStartTime;
 };
