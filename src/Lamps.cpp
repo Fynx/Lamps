@@ -2,7 +2,7 @@
 #include "Lamps.h"
 
 Lamps::Lamps()
-	: controlPanel(this), userPanel(this)
+	: controlPanel(this), userPanel(this), experimentTime(0), pauseNumber(0)
 {
 	stackedWidget = new QStackedWidget();
 
@@ -15,7 +15,7 @@ Lamps::Lamps()
 
 	connect(&controlPanel, &ControlPanel::start, this, &Lamps::settingsSet);
 	connect(&controlPanel, &ControlPanel::quit, this, &Lamps::quit);
-	connect(&experiment, &Experiment::experimentEnded, this, &Lamps::settingsSet);
+// 	connect(&experiment, &Experiment::experimentEnded, this, &Lamps::settingsSet);
 	connect(&userPanel, &UserPanel::start, this, &Lamps::start);
 	connect(&experiment, &Experiment::experimentStopped, this, &Lamps::save);
 
@@ -102,17 +102,23 @@ void Lamps::save()
 		qDebug() << "saving statistics";
 	}
 
+	++pauseNumber;
 	QVector<QVector<QVariant> > info;
-	info.append({"pseudonim", userPanel.nick()});
+	if (pauseNumber == 1 && sessionNumber == 1) {
+		info.append({"pseudonim", userPanel.nick()});
+		info.append({"\"max czas eksperymentu\"", controlPanel.maxExperimentTime()});
+		info.append({"\"sprzezenie zwrotne\"", (int) controlPanel.withFeedback()});
+		info.append({"\"z czasem\"", (int) controlPanel.withTimer()});
+		info.append({"\"timeout\"", controlPanel.timeout()});
+	}
+
+	experimentTime = experiment.experimentTime();
+
 	info.append({"data", QDate::currentDate().toString("d.M.yy")});
 	info.append({"\"numer sesji\"", sessionNumber});
 	info.append({"\"czas rozpoczecia\"", experimentStartTime.toString("hh:mm:ss")});
 	info.append({"\"czas zatrzymania\"", QTime::currentTime().toString("hh:mm:ss")});
-
-	info.append({"\"max czas eksperymentu\"", controlPanel.maxExperimentTime()});
-	info.append({"\"sprzezenie zwrotne\"", (int) controlPanel.withFeedback()});
-	info.append({"\"z czasem\"", (int) controlPanel.withTimer()});
-	info.append({"\"timeout\"", controlPanel.timeout()});
+	info.append({"\"czas trwania\"", experimentTime});
 
 	QString filePath = controlPanel.filePath();
 	if (filePath.isEmpty())
@@ -136,12 +142,14 @@ bool Lamps::load()
 
 	QSet<Experiment::Configuration> configurations;
 
+	experimentTime = 0;
+
 	while (!file.atEnd()) {
 		QByteArray data = file.readLine();
 		QStringList list = QString(data).split(",");
 		if (list[0] == "\"numer sesji\"") {
-			if (sessionNumber == list[1].toInt())
-				configurations.clear();
+// 			if (sessionNumber == list[1].toInt())
+// 				configurations.clear();
 			sessionNumber = list[1].toInt() + 1;
 		} else if (list[0] == "pseudonim") {
 			userPanel.setNick(list[1].left(list[1].size() - 1));
@@ -153,6 +161,8 @@ bool Lamps::load()
 			controlPanel.setWithTimer((bool) list[1].toInt());
 		} else if (list[0] == "\"timeout\"") {
 			controlPanel.setTimeout(list[1].toInt());
+		} else if (list[0] == "\"czas trwania\"") {
+			experimentTime = list[1].toInt();
 		} else if (list.size() == 10) {
 			Experiment::Configuration c(10);
 			int i = 0;
@@ -161,6 +171,8 @@ bool Lamps::load()
 			configurations.insert(c);
 		}
 	}
+
+	experiment.setCurrentTime(experimentTime);
 
 	experiment.setConfigurations();
 	experiment.removeConfigurations(configurations);

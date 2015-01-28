@@ -40,7 +40,8 @@ Experiment::Experiment()
 	  totalTime(0),
 	  randomConfigurations(false),
 	  checkProbability(0),
-	  started(false)
+	  started(false),
+	  ended(false)
 {
 	QGraphicsScene *scene = new QGraphicsScene();
 
@@ -130,7 +131,7 @@ void Experiment::setTimeout(int time)
 
 void Experiment::setExperimentTime(int time)
 {
-	totalTime = time;
+	totalTime = time * 1000;
 }
 
 void Experiment::setWithFeedback(bool yes)
@@ -169,10 +170,15 @@ void Experiment::timeout()
 	if (configurations.isEmpty())
 		setConfigurations();
 
-	timeElapsed += period;
+	if (!practise)
+		timeElapsed += period;
 	if ((timeElapsed >= totalTime && totalTime != 0) || (configurations.isEmpty() && !randomConfigurations)) {
 		stop();
+		ended = true;
+		qDebug() << "experiment ended";
 		emit experimentEnded();
+		updateText();
+		return;
 	}
 
 	if (!withTimer) {
@@ -197,6 +203,19 @@ void Experiment::onLampExpired()
 
 void Experiment::updateText()
 {
+	if (ended) {
+		textExperimentEnded->setVisible(true);
+
+		textTrialSession->setVisible(false);
+		textTrialSessionName->setVisible(false);
+		textMainSessionName->setVisible(false);
+		textResumeSession->setVisible(false);
+		textStartSession->setVisible(false);
+		textStopSession->setVisible(false);
+
+		return;
+	}
+
 	if (practise) {
 		textTrialSessionName->setVisible(true);
 		textMainSessionName->setVisible(false);
@@ -270,6 +289,16 @@ void Experiment::trigger(Qt::Key key)
 		if (feedback)
 			beep();
 	}
+}
+
+void Experiment::setCurrentTime(int time)
+{
+	timeElapsed = time * 1000;
+}
+
+int Experiment::experimentTime()
+{
+	return timeElapsed / 1000;
 }
 
 void Experiment::clearConfigurations()

@@ -27,6 +27,8 @@ private:
 	UserPanel userPanel;
 	QTime experimentStartTime;
 	int sessionNumber;
+	int experimentTime;
+	int pauseNumber;
 
 	QString previousInfo;
 };

@@ -26,6 +26,9 @@ public:
 	void stop();
 	void trigger(Qt::Key key);
 
+	void setCurrentTime(int time);
+	int experimentTime();
+
 	void clearConfigurations();
 	void removeConfigurations(const QSet<Configuration> &cs);
 
@@ -77,6 +80,7 @@ private:
 	QTimer timer;
 	int period;
 	bool started;
+	bool ended;
 
 	/** Stats */
 	int correctChecks;

@@ -9,9 +9,11 @@ ControlPanel::ControlPanel(QWidget* parent)
 	QHBoxLayout *layoutMaxExperimentTime = new QHBoxLayout();
 
 	QSpacerItem *spacerMaxExperimentTime = new QSpacerItem(30, 10);
-	QLabel *labelMaxExperimentTime = new QLabel("Maksymalny czas eksperymentu");
+	QLabel *labelMaxExperimentTime = new QLabel("Maksymalny czas eksperymentu (s)");
 	spinBoxMaxExperimentTime = new QSpinBox();
-	spinBoxMaxExperimentTime->setFixedWidth(100);
+	spinBoxMaxExperimentTime->setFixedWidth(140);
+	spinBoxMaxExperimentTime->setMinimum(10);
+	spinBoxMaxExperimentTime->setMaximum(3600 * 24);
 
 	layoutMaxExperimentTime->addWidget(spinBoxMaxExperimentTime);
 	layoutMaxExperimentTime->addItem(spacerMaxExperimentTime);
@@ -30,7 +32,7 @@ ControlPanel::ControlPanel(QWidget* parent)
 	QHBoxLayout *layoutTimeout = new QHBoxLayout();
 
 	spinBoxTimeout = new QSpinBox(this);
-	spinBoxTimeout->setFixedWidth(100);
+	spinBoxTimeout->setFixedWidth(140);
 	spinBoxTimeout->setMinimum(20);
 	spinBoxTimeout->setMaximum(9999);
 	spinBoxTimeout->setValue(50);
@@ -53,9 +55,9 @@ ControlPanel::ControlPanel(QWidget* parent)
 	buttonLoadLast = new QPushButton("Wczytaj sesję");
 	labelSessionFileName = new QLabel("");
 
-	buttonConfirm->setFixedWidth(70);
-	buttonQuit->setFixedWidth(70);
-	buttonLoadLast->setFixedWidth(140);
+	buttonConfirm->setFixedWidth(100);
+	buttonQuit->setFixedWidth(100);
+	buttonLoadLast->setFixedWidth(170);
 
 	connect(buttonConfirm, &QPushButton::clicked, this, &ControlPanel::start);
 	connect(buttonQuit, &QPushButton::clicked, this, &ControlPanel::quit);
