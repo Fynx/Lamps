@@ -11,6 +11,8 @@ public:
 
 	QString nick() const;
 	void setNick(const QString &nick);
+	QString gender() const;
+	int age() const;
 
 signals:
 	void start();
@@ -20,5 +22,9 @@ private:
 
 	QLineEdit *lineEditNick;
 	QLabel *labelNickWarning;
+	QGroupBox *groupBoxGender;
+	QRadioButton *buttonFemale;
+	QRadioButton *buttonMale;
+	QSpinBox *boxAge;
 	QPushButton *buttonStart;
 };

@@ -28,6 +28,42 @@ UserPanel::UserPanel(QWidget *parent)
 	layout->addItem(layoutNick);
 
 
+	QSpacerItem *genderSpacer = new QSpacerItem(30, 30);
+
+	groupBoxGender = new QGroupBox("Płeć");
+
+	groupBoxGender->setFixedWidth(300);
+
+	buttonFemale = new QRadioButton("kobieta");
+	buttonMale = new QRadioButton("mężczyzna");
+
+	buttonFemale->setChecked(true);
+
+	QVBoxLayout *genderLayout = new QVBoxLayout();
+	genderLayout->addWidget(buttonFemale);
+	genderLayout->addWidget(buttonMale);
+
+	groupBoxGender->setLayout(genderLayout);
+
+	layout->addItem(genderSpacer);
+	layout->addWidget(groupBoxGender);
+
+
+	QSpacerItem *spacerAge = new QSpacerItem(30, 30);
+	QLabel *labelAge = new QLabel("Wiek");
+
+	boxAge = new QSpinBox();
+
+	boxAge->setFixedWidth(80);
+	boxAge->setMinimum(4);
+	boxAge->setMaximum(200);
+	boxAge->setValue(20);
+
+	layout->addItem(spacerAge);
+	layout->addWidget(labelAge);
+	layout->addWidget(boxAge);
+
+
 	QSpacerItem *spacerButton = new QSpacerItem(30, 30);
 	layout->addItem(spacerButton);
 
@@ -55,6 +91,19 @@ QString UserPanel::nick() const
 void UserPanel::setNick(const QString &nick)
 {
 	lineEditNick->setText(nick);
+}
+
+QString UserPanel::gender() const
+{
+	if (buttonMale->isChecked())
+		return "mezczyzna";
+	else
+		return "kobieta";
+}
+
+int UserPanel::age() const
+{
+	return boxAge->value();
 }
 
 void UserPanel::started()

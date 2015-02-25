@@ -8,6 +8,19 @@ cmake 2.8
 gcc 4.8.3
 Qt 5.4.0
 
+## Kompilacja i uruchamianie
+
+Należy wejść do katalogu Lamps.
+
+	mkdir build
+	cd build
+	cmake ..
+	make
+
+Program uruchamia się z poziomu katalogu build za pomocą polecenia bin/Lamps.
+
+Pliki z danymi są zapisywane również w katalogu build.
+
 ## Komponenty
 
 ### Panel eksperymentatora

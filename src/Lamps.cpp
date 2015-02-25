@@ -106,6 +106,8 @@ void Lamps::save()
 	QVector<QVector<QVariant> > info;
 	if (pauseNumber == 1 && sessionNumber == 1) {
 		info.append({"pseudonim", userPanel.nick()});
+		info.append({"plec", userPanel.gender()});
+		info.append({"wiek", userPanel.age()});
 		info.append({"\"max czas eksperymentu\"", controlPanel.maxExperimentTime()});
 		info.append({"\"sprzezenie zwrotne\"", (int) controlPanel.withFeedback()});
 		info.append({"\"z czasem\"", (int) controlPanel.withTimer()});
